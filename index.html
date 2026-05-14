@@ -902,27 +902,61 @@ function finishSimon() {
 // BUILD PARTICIPANT DATA
 // ═══════════════════════════════════════════════
 function buildData() {
-  const ansLog = {};
-  ['logic','verbal','spatial'].forEach(sec => {
-    const qs = sec==='logic'?LOGIC_QS:sec==='verbal'?VERBAL_QS:SPATIAL_QS;
-    ansLog[sec] = qs.map(q => ({ id:q.id, correct: answers[sec][q.id]===true }));
-  });
+
+  const logicCorrect =
+    scores.logic >= scores.verbal &&
+    scores.logic >= scores.spatial &&
+    scores.logic >= scores.simon;
+
+  const verbalCorrect =
+    scores.verbal >= scores.logic &&
+    scores.verbal >= scores.spatial &&
+    scores.verbal >= scores.simon;
+
+  const spatialCorrect =
+    scores.spatial >= scores.logic &&
+    scores.spatial >= scores.verbal &&
+    scores.spatial >= scores.simon;
+
+  let persona = 'The Tactician';
+
+  if (logicCorrect) persona = 'The Strategist';
+  else if (verbalCorrect) persona = 'The Lore-Seeker';
+  else if (spatialCorrect) persona = 'The Wayfinder';
+
   return {
+
     timestamp: new Date().toISOString(),
+
     age_group: survey.age,
     playtime: survey.playtime,
     primary_device: survey.device,
     primary_genre: survey.genre,
     genre_other: survey.genre_other || '',
     fav_game: survey.fav_game || '',
+
     logic_score: scores.logic,
     verbal_score: scores.verbal,
-    spatial_score:scores.spatial,
+    spatial_score: scores.spatial,
+
+    logic_q1: answers.logic.l1 === true ? 1 : 0,
+    logic_q2: answers.logic.l2 === true ? 1 : 0,
+    logic_q3: answers.logic.l3 === true ? 1 : 0,
+
+    verbal_q1: answers.verbal.v1 === true ? 1 : 0,
+    verbal_q2: answers.verbal.v2 === true ? 1 : 0,
+    verbal_q3: answers.verbal.v3 === true ? 1 : 0,
+
+    spatial_q1: answers.spatial.s1 === true ? 1 : 0,
+    spatial_q2: answers.spatial.s2 === true ? 1 : 0,
+    spatial_q3: answers.spatial.s3 === true ? 1 : 0,
+
     simon_highest_level: simonData?.highestLevel ?? 0,
     simon_total_correct: simonData?.totalCorrectClicks ?? 0,
-    average_reaction_time: simonData?.averageResponseTime_s ?? null,
-    simon_incorrect_crystal:simonData?.incorrectCrystal ?? '—',
-    answerLog: ansLog
+    average_reaction_time: simonData?.averageResponseTime_s ?? '',
+    simon_incorrect_crystal: simonData?.incorrectCrystal ?? '',
+
+    gaming_persona: persona
   };
 }
 
