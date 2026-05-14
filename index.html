@@ -402,11 +402,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <div class="opt" onclick="selRad('genre','moba',this)"><div class="opt-dot"></div><div class="opt-text">MOBA <small>e.g., League of Legends, Wild Rift, Pokémon UNITE</small></div></div>
         <div class="opt" onclick="selRad('genre','puzzle',this)"><div class="opt-dot"></div><div class="opt-text">Puzzle / Strategy <small>e.g., Portal 2, Teamfight Tactics, Clash Royale</small></div></div>
         <div class="opt" onclick="selRad('genre','rhythm',this)"><div class="opt-dot"></div><div class="opt-text">Rhythm / Simulation <small>e.g., Project SEKAI, osu!, The Sims 4</small></div></div>
-        <div class="opt" onclick="selRad('genre','other',this)" id="opt-genre-other"><div class="opt-dot"></div><div class="opt-text">Other</div></div>
-      </div>
-      <div id="genre-other-wrap" style="display:none;margin-top:9px;">
-        <input class="txt-in" type="text" id="genre-other-txt" placeholder="Tell us what you play…" oninput="survey.genre_other=this.value"/>
-      </div>
       <div class="err" id="err-genre">Please select your primary genre.</div>
     </div>
   </div>
@@ -558,7 +553,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 // ═══════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════
-const survey = { age:'', playtime:'', device:'', genre:'', genre_other:'', fav_game:'' };
+const survey = { age:'', playtime:'', device:'', genre:'', fav_game:'' };
 const scores = { logic:0, verbal:0, spatial:0, simon:0 };
 const answers = { logic:{}, verbal:{}, spatial:{} };
 let simonData = null;
@@ -590,16 +585,21 @@ function goTo(id) {
 function selRad(name, val, el) {
   el.closest('.opt-list').querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
   el.classList.add('sel');
+
   survey[name] = val;
+
   hideErr('err-' + name);
-  if (name === 'genre') {
-    const isOther = val === 'other';
-    document.getElementById('genre-other-wrap').style.display = isOther ? 'block' : 'none';
-    if (!isOther) { survey.genre_other = ''; document.getElementById('genre-other-txt').value = ''; }
-  }
 }
-function showErr(id) { const e = document.getElementById(id); if(e) e.classList.add('on'); }
-function hideErr(id) { const e = document.getElementById(id); if(e) e.classList.remove('on'); }
+
+function showErr(id) {
+  const e = document.getElementById(id);
+  if(e) e.classList.add('on');
+}
+
+function hideErr(id) {
+  const e = document.getElementById(id);
+  if(e) e.classList.remove('on');
+}
 
 // ═══════════════════════════════════════════════
 // CONSENT
@@ -934,18 +934,14 @@ function buildData() {
     String(now.getMinutes()).padStart(2, '0') + ":" +
     String(now.getSeconds()).padStart(2, '0');
 
-  const participantID = "P" + Date.now();
-
   return {
 
-    participant_id: participantID,
     timestamp: "'" + formattedTime,
 
     age_group: survey.age,
     playtime: survey.playtime,
     primary_device: survey.device,
     primary_genre: survey.genre,
-    genre_other: survey.genre_other,
     fav_game: survey.fav_game,
 
     logic_score: scores.logic,
